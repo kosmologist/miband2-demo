@@ -1,6 +1,6 @@
 package com.assistant.wavy
 
-import android.bluetooth.BluetoothDevice
+import android.bluetooth.*
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -37,7 +37,8 @@ class MainActivity : AppCompatActivity(), DeviceListener {
         adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, ArrayList<String>())
         listDevices.adapter = adapter
         listDevices.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
-            tvStatus.text = "Selected Device:  ${devices.get(position).name} ${devices.get(position).address}"
+            tvStatus.text = "Connecting Device:  ${devices.get(position).name} ${devices.get(position).address}"
+            connectToDevice(devices.get(position))
         }
 
 
@@ -60,4 +61,48 @@ class MainActivity : AppCompatActivity(), DeviceListener {
             adapter.notifyDataSetChanged()
         }
     }
+
+    var bluetoothGatt:BluetoothGatt? = null
+    fun connectToDevice(device: BluetoothDevice){
+        bluetoothGatt = device.connectGatt(this, false, bluetoothGattCallback)
+    }
+
+    fun disconnect(device: BluetoothDevice){
+        bluetoothGatt?.let {
+            it.disconnect()
+            it.close()
+            bluetoothGatt = null
+        }
+    }
+
+    val bluetoothGattCallback = object : BluetoothGattCallback(){
+        override fun onCharacteristicRead(gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?, status: Int) {
+            super.onCharacteristicRead(gatt, characteristic, status)
+        }
+
+        override fun onCharacteristicWrite(gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?, status: Int) {
+            super.onCharacteristicWrite(gatt, characteristic, status)
+        }
+
+        override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
+            super.onServicesDiscovered(gatt, status)
+        }
+
+        override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
+            console.log("Connection State changed " + newState)
+            if (newState == BluetoothProfile.STATE_CONNECTED){
+                console.log("Connected from Server")
+            } else if (newState == BluetoothProfile.STATE_DISCONNECTED){
+                console.log("Disconnected from Server")
+            }
+        }
+
+        override fun onCharacteristicChanged(gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?) {
+            super.onCharacteristicChanged(gatt, characteristic)
+        }
+    }
+
+
+
+
 }
