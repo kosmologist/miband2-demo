@@ -39,7 +39,8 @@ class MainActivity : AppCompatActivity(), DeviceListener {
 
     fun log(msg: String) {
         runOnUiThread {
-            tvDebugView.text = tvDebugView.text.toString() + msg + "\n"
+            tvDebugView.text = msg + "\n" + tvDebugView.text.toString()
+//            tvDebugView.text = tvDebugView.text.toString() + msg + "\n"
         }
     }
 
