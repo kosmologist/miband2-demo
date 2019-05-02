@@ -27,3 +27,5 @@ val startHeartMeasurementManual = byteArrayOf(0x15, COMMAND_SET_HR_MANUAL, 1)
 val stopHeartMeasurementManual = byteArrayOf(0x15, COMMAND_SET_HR_MANUAL, 0)
 val startHeartMeasurementContinuous = byteArrayOf(0x15, COMMAND_SET__HR_CONTINUOUS, 1)
 val stopHeartMeasurementContinuous = byteArrayOf(0x15, COMMAND_SET__HR_CONTINUOUS, 0)
+
+val heartMeasurementContinuousKeepAlive = byteArrayOf(0x16)

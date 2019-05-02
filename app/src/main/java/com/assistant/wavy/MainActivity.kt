@@ -48,6 +48,7 @@ class MainActivity : AppCompatActivity(), DeviceListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        handler = Handler()
         tvDebugView.movementMethod = ScrollingMovementMethod()
         log("BLE ${if (!isBLESupported(this)) "Not " else ""}Supported")
 
@@ -110,6 +111,17 @@ class MainActivity : AppCompatActivity(), DeviceListener {
     }
 
 
+    lateinit var handler:Handler
+    fun pingToKeepAlive(characteristic: BluetoothGattCharacteristic){
+        handler.postDelayed({
+            log("Pinging to keep alive")
+            characteristic.value = heartMeasurementContinuousKeepAlive
+            write(characteristic)
+            pingToKeepAlive(characteristic)
+        }, 12000)
+    }
+
+
     val bluetoothGattCallback = object : BluetoothGattCallback() {
         override fun onCharacteristicRead(
             gatt: BluetoothGatt?,
@@ -146,6 +158,7 @@ class MainActivity : AppCompatActivity(), DeviceListener {
                 } else if (currentState == HR_STATE.startContinous) {
                     log("Started Continous measurment succesfully")
                     currentState = HR_STATE.startedContinousMeasument
+                    pingToKeepAlive(characteristic!!)
                 }
             }
         }
