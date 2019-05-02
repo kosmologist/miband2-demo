@@ -3,17 +3,20 @@ package com.assistant.wavy
 import android.bluetooth.*
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.text.method.ScrollingMovementMethod
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.TextView
+import androidx.core.os.postDelayed
 import com.assistant.wavy.core.*
 import com.assistant.wavy.utils.console
 import com.assistant.wavy.utils.isBLESupported
 import kotlinx.android.synthetic.main.activity_main.*
 import java.lang.IllegalStateException
+import java.lang.RuntimeException
 import java.lang.StringBuilder
 import java.security.InvalidKeyException
 import java.security.NoSuchAlgorithmException
@@ -24,6 +27,7 @@ import javax.crypto.IllegalBlockSizeException
 import javax.crypto.NoSuchPaddingException
 import javax.crypto.spec.SecretKeySpec
 import kotlin.collections.ArrayList
+import kotlin.experimental.and
 
 class MainActivity : AppCompatActivity(), DeviceListener {
 
@@ -78,6 +82,9 @@ class MainActivity : AppCompatActivity(), DeviceListener {
     var bluetoothGatt: BluetoothGatt? = null
     lateinit var selectedDevice: BluetoothDevice
 
+    var charateristicHRControlPoint: BluetoothGattCharacteristic? = null
+    var characteristicHRMeasurement: BluetoothGattCharacteristic? = null
+
     private fun connectToDevice() {
         bluetoothGatt = selectedDevice.connectGatt(this, false, bluetoothGattCallback)
     }
@@ -90,6 +97,18 @@ class MainActivity : AppCompatActivity(), DeviceListener {
         }
     }
 
+
+    var currentState = HR_STATE.idle
+
+    enum class HR_STATE {
+        idle,
+        stopManual,
+        stopContinous,
+        startContinous,
+        startedContinousMeasument
+    }
+
+
     val bluetoothGattCallback = object : BluetoothGattCallback() {
         override fun onCharacteristicRead(
             gatt: BluetoothGatt?,
@@ -97,7 +116,12 @@ class MainActivity : AppCompatActivity(), DeviceListener {
             status: Int
         ) {
             super.onCharacteristicRead(gatt, characteristic, status)
-            console.log("onCharacteristicRead")
+            log("onCharacteristicRead ${characteristic?.uuid}")
+            if (characteristic?.uuid == UUID_CHARACTERISTIC_HEART_RATE_MEASUREMENT) {
+                log("Characteristic read for HR measurment")
+                val value = characteristic?.value ?: throw IllegalStateException("Should never happen..")
+                handleHeartRate(value)
+            }
         }
 
         override fun onCharacteristicWrite(
@@ -106,7 +130,23 @@ class MainActivity : AppCompatActivity(), DeviceListener {
             status: Int
         ) {
             super.onCharacteristicWrite(gatt, characteristic, status)
-            console.log("onCharacteristicWrite")
+            log("onCharacteristicWrite ${characteristic?.uuid}")
+            if (characteristic?.uuid == UUID_CHARACTERISTIC_HEART_RATE_CONTROL_POINT && status == BluetoothGatt.GATT_SUCCESS) {
+                if (currentState == HR_STATE.stopManual) {
+                    characteristic?.value = stopHeartMeasurementContinuous
+                    val result = write(characteristic!!)
+                    currentState = HR_STATE.stopContinous
+                    if (result) log("Stopped Manual Measurment, Moving to step 2") else log("ERR: Failed to stop Manual measurment")
+                } else if (currentState == HR_STATE.stopContinous) {
+                    characteristic?.value = startHeartMeasurementContinuous
+                    val result = write(characteristic!!)
+                    currentState = HR_STATE.startContinous
+                    if (result) log("Stopped Continous Measurment, Moving to step 3") else log("ERR: Failed to stop Continous measurment")
+                } else if (currentState == HR_STATE.startContinous) {
+                    log("Started Continous measurment succesfully")
+                    currentState = HR_STATE.startedContinousMeasument
+                }
+            }
         }
 
         override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
@@ -116,10 +156,20 @@ class MainActivity : AppCompatActivity(), DeviceListener {
             if (services != null) log(listServices(services))
             val authCharacteristic =
                 services?.last()?.getCharacteristic(UUID.fromString("00000009-0000-3512-2118-0009af100700"))
+
+            val heartRateService = services?.find { it.uuid == UUID_SERVICE_HEART_RATE }
+                ?: throw RuntimeException("HR Service Not found")  //todo: fix this
+            characteristicHRMeasurement = heartRateService.getCharacteristic(UUID_CHARACTERISTIC_HEART_RATE_MEASUREMENT)
+            charateristicHRControlPoint =
+                heartRateService.getCharacteristic(UUID_CHARACTERISTIC_HEART_RATE_CONTROL_POINT)
+            if (characteristicHRMeasurement != null && charateristicHRControlPoint != null) {
+                log("HR Service and Charateristics found...")
+            } else throw RuntimeException("ERR: HR Service and Charateristics not found")
+
             if (authCharacteristic != null) {
                 log("Auth Characteristic Found, Requesting Permission from Device")
                 requestPermissionFromDevice(authCharacteristic)
-            } else log("Auth characteristics not found")
+            } else log("ERR: Auth characteristics not found")
         }
 
         override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
@@ -143,14 +193,25 @@ class MainActivity : AppCompatActivity(), DeviceListener {
                 } else if (value[0] == AUTH_RESPONSE && value[1] == AUTH_REQUEST_RANDOM_AUTH_NUMBER && value[2] == AUTH_SUCCESS) {
                     log("Step 3. Sending the encrypted random key to band")
                     sendEncryptedRandomKeyToBand(characteristic)
-                } else if (value[0] == AUTH_RESPONSE && value[1] == AUTH_SEND_ENCRYPTED_AUTH_NUMBER
-                    && value[2] == AUTH_SUCCESS
-                ) {
+                } else if (value[0] == AUTH_RESPONSE && value[1] == AUTH_SEND_ENCRYPTED_AUTH_NUMBER && value[2] == AUTH_SUCCESS) {
                     log("Authenticated, now moving to phase 2...")
+                    enableRealtimeHeartRateMeasurement(true)
                 }
+            } else if (characteristic?.uuid == UUID_CHARACTERISTIC_HEART_RATE_MEASUREMENT) {
+                log("Heart Rate Measurement charateristic changed")
+                val value = characteristic?.value ?: throw IllegalStateException("Should never happen..")
+                handleHeartRate(value)
             } else {
+                log("Unknown characteristic changed: ${characteristic?.uuid}")
                 super.onCharacteristicChanged(gatt, characteristic)
             }
+        }
+    }
+
+    private fun handleHeartRate(value: ByteArray) {
+        if (value.size == 2 && value[0].toInt() == 0) {
+            val hrValue = value[1] and 0xff.toByte()
+            log("Heart Rate: $hrValue")
         }
     }
 
@@ -215,10 +276,68 @@ class MainActivity : AppCompatActivity(), DeviceListener {
             bluetoothGatt?.setCharacteristicNotification(characteristic, enableNotification)
             return bluetoothGatt?.writeCharacteristic(characteristic) ?: false
         } else {
-            console.log("Unable to write characteristic")
+            log("Unable to write characteristic")
             return false
         }
     }
+
+    fun delay(duration: Long, callback: () -> Unit) {
+        Handler().postDelayed(callback, duration)
+    }
+
+    fun enableRealtimeHeartRateMeasurement(enable: Boolean) {
+        charateristicHRControlPoint?.let {
+            enableNotificationForHRMeasurement(enable)
+            if (enable) {
+                it.value = stopHeartMeasurementManual
+                val result1 = write(it)
+                if (result1) log("Stopped HR Measurement Manual") else log("ERR: Failed to stop HR Measurement Manual")
+                currentState = HR_STATE.stopManual
+            } else {
+                it.value = stopHeartMeasurementContinuous
+            }
+        } ?: log("ERR: Failed to enable Realtime HR Measurment")
+    }
+
+    private fun enableNotificationForHRMeasurement(enable: Boolean) {
+        val gatt = bluetoothGatt ?: throw IllegalStateException("SHOULD NOT HAPPEN")
+        val characteristic = characteristicHRMeasurement ?: throw IllegalStateException("SHOULD NOT HAPPEN")
+        val result = enableNotification(gatt, characteristic, enable)
+        if (result) log("Enabled HR Measurment notif") else log("ERR: Failed to enable HR Measurement notif")
+    }
+
+    private fun enableNotification(
+        gatt: BluetoothGatt,
+        characteristic: BluetoothGattCharacteristic,
+        flag: Boolean
+    ): Boolean {
+        var result = gatt.setCharacteristicNotification(characteristic, flag)
+        /*if (result) {
+            val notifyDescriptor =
+                characteristic.getDescriptor(UUID_DESCRIPTOR_GATT_CLIENT_CHARACTERISTIC_CONFIGURATION)
+            if (notifyDescriptor != null) {
+                val properties = characteristic.properties
+                when {
+                    (properties and BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0 -> {
+                        notifyDescriptor.value =
+                            if (flag) BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE else BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE
+                        result = gatt.writeDescriptor(notifyDescriptor)
+                    }
+                    (properties and BluetoothGattCharacteristic.PROPERTY_INDICATE) > 0 -> {
+                        notifyDescriptor.value =
+                            if (flag) BluetoothGattDescriptor.ENABLE_INDICATION_VALUE else BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE
+                        result = gatt.writeDescriptor(notifyDescriptor)
+                    }
+                }
+            } else {
+                log("WARN: descriptor client_charac_config for characteristic ${characteristic.uuid} is null")
+            }
+        } else {
+            log("ERR: Unable to enable notification for ${characteristic.uuid}")
+        }*/
+        return result
+    }
+
 
     @Throws(
         InvalidKeyException::class,
