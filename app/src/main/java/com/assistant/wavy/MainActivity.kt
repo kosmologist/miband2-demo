@@ -9,16 +9,20 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.TextView
-import androidx.core.graphics.blue
-import com.assistant.wavy.core.AUTH_BYTE
-import com.assistant.wavy.core.AUTH_SEND_KEY
-import com.assistant.wavy.core.DeviceListener
-import com.assistant.wavy.core.DeviceManager
+import com.assistant.wavy.core.*
 import com.assistant.wavy.utils.console
 import com.assistant.wavy.utils.isBLESupported
 import kotlinx.android.synthetic.main.activity_main.*
+import java.lang.IllegalStateException
 import java.lang.StringBuilder
+import java.security.InvalidKeyException
+import java.security.NoSuchAlgorithmException
 import java.util.*
+import javax.crypto.BadPaddingException
+import javax.crypto.Cipher
+import javax.crypto.IllegalBlockSizeException
+import javax.crypto.NoSuchPaddingException
+import javax.crypto.spec.SecretKeySpec
 import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity(), DeviceListener {
@@ -130,8 +134,23 @@ class MainActivity : AppCompatActivity(), DeviceListener {
         }
 
         override fun onCharacteristicChanged(gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?) {
-            super.onCharacteristicChanged(gatt, characteristic)
             log("onCharacteristicChanged ${characteristic?.uuid}")
+            if (characteristic?.uuid == UUID_CHARACTERISTIC_AUTH) {
+                val value = characteristic?.value ?: throw IllegalStateException("SHOULD NEVER HAPPEN")
+                if (value[0] == AUTH_RESPONSE && value[1] == AUTH_SEND_KEY && value[2] == AUTH_SUCCESS) {
+                    log("Step2. Sending secrect key to band now...")
+                    sendSecretKeyToBand(characteristic)
+                } else if (value[0] == AUTH_RESPONSE && value[1] == AUTH_REQUEST_RANDOM_AUTH_NUMBER && value[2] == AUTH_SUCCESS) {
+                    log("Step 3. Sending the encrypted random key to band")
+                    sendEncryptedRandomKeyToBand(characteristic)
+                } else if (value[0] == AUTH_RESPONSE && value[1] == AUTH_SEND_ENCRYPTED_AUTH_NUMBER
+                    && value[2] == AUTH_SUCCESS
+                ) {
+                    log("Authenticated, now moving to phase 2...")
+                }
+            } else {
+                super.onCharacteristicChanged(gatt, characteristic)
+            }
         }
     }
 
@@ -147,27 +166,73 @@ class MainActivity : AppCompatActivity(), DeviceListener {
         return builder.toString()
     }
 
-    fun getSecretKey(): ByteArray{
-        val authKeyBytes = byteArrayOf(0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45)
+    private fun getSecretKey(): ByteArray {
+        val authKeyBytes =
+            byteArrayOf(0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45)
         return authKeyBytes
     }
 
+    // Step.1
     fun requestPermissionFromDevice(authCharacteristic: BluetoothGattCharacteristic) {
-
-        val key:ByteArray = org.apache.commons.lang3.ArrayUtils.addAll(
-            byteArrayOf(AUTH_SEND_KEY.toByte(), AUTH_BYTE.toByte()),
+        val key: ByteArray = org.apache.commons.lang3.ArrayUtils.addAll(
+            byteArrayOf(AUTH_SEND_KEY, AUTH_BYTE),
             *getSecretKey()
         )
         authCharacteristic.value = key
-
-        if ((authCharacteristic.properties and BluetoothGattCharacteristic.PROPERTY_WRITE) > 0 ||
-            (authCharacteristic.properties and BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE) > 0) {
-            //bluetoothGatt?.setCharacteristicNotification(authCharacteristic, true)
-            val result = bluetoothGatt?.writeCharacteristic(authCharacteristic)
+        val result = write(authCharacteristic)
+        if (result) {
             log("Auth Characteristics wrote: $result")
+        } else log("Unable to write auth characteristic")
+    }
+
+    // authflag==authbyte
+    private fun requestAuthNumber(): ByteArray {
+        return byteArrayOf(AUTH_REQUEST_RANDOM_AUTH_NUMBER, AUTH_BYTE)
+    }
+
+    // Step.2
+    fun sendSecretKeyToBand(characteristic: BluetoothGattCharacteristic) {
+        characteristic.value = requestAuthNumber()
+        val result = write(characteristic)
+        if (result) log("Secrect Key sent to band") else log("Failed to send secrect key to band")
+    }
+
+    // Step.3
+    fun sendEncryptedRandomKeyToBand(characteristic: BluetoothGattCharacteristic) {
+        val value = characteristic.value
+        val eValue = handleAESAuth(value, getSecretKey())
+        val responseValue =
+            org.apache.commons.lang3.ArrayUtils.addAll(byteArrayOf(AUTH_SEND_ENCRYPTED_AUTH_NUMBER, AUTH_BYTE), *eValue)
+        characteristic.value = responseValue
+        val result = write(characteristic)
+        if (result) log("Sent Encrypted Random Key to Band") else log("Failed to send encrypted random key to band")
+    }
+
+    private fun write(characteristic: BluetoothGattCharacteristic, enableNotification: Boolean = true): Boolean {
+        if ((characteristic.properties and BluetoothGattCharacteristic.PROPERTY_WRITE) > 0 ||
+            (characteristic.properties and BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE) > 0
+        ) {
+            bluetoothGatt?.setCharacteristicNotification(characteristic, enableNotification)
+            return bluetoothGatt?.writeCharacteristic(characteristic) ?: false
         } else {
-            log("Unable to write auth characteristic")
+            console.log("Unable to write characteristic")
+            return false
         }
+    }
+
+    @Throws(
+        InvalidKeyException::class,
+        NoSuchPaddingException::class,
+        NoSuchAlgorithmException::class,
+        BadPaddingException::class,
+        IllegalBlockSizeException::class
+    )
+    private fun handleAESAuth(value: ByteArray, secretKey: ByteArray): ByteArray {
+        val mValue = Arrays.copyOfRange(value, 3, 19)
+        val ecipher = Cipher.getInstance("AES/ECB/NoPadding")
+        val newKey = SecretKeySpec(secretKey, "AES")
+        ecipher.init(Cipher.ENCRYPT_MODE, newKey)
+        return ecipher.doFinal(mValue)
     }
 
 
