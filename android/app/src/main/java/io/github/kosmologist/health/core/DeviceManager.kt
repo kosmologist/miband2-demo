@@ -1,13 +1,10 @@
-package com.assistant.wavy.core
+package io.github.kosmologist.health.core
 
-import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.content.Context
-import androidx.lifecycle.MutableLiveData
-import com.assistant.wavy.utils.console
+import io.github.kosmologist.health.utils.console
 
 class DeviceManager(private val context: Context, val listener: DeviceListener) {
 

@@ -1,4 +1,4 @@
-package com.assistant.wavy.utils
+package io.github.kosmologist.health.utils
 
 import android.util.Log
 

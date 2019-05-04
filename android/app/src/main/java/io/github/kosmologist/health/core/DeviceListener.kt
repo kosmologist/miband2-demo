@@ -1,4 +1,4 @@
-package com.assistant.wavy.core
+package io.github.kosmologist.health.core
 
 import android.bluetooth.BluetoothDevice
 

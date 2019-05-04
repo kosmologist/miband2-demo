@@ -1,7 +1,6 @@
-package com.assistant.wavy
+package io.github.kosmologist.health
 
 import android.bluetooth.*
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.text.method.ScrollingMovementMethod
@@ -10,14 +9,11 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.TextView
-import androidx.core.os.postDelayed
-import com.assistant.wavy.core.*
-import com.assistant.wavy.utils.console
-import com.assistant.wavy.utils.isBLESupported
+import androidx.appcompat.app.AppCompatActivity
+import io.github.kosmologist.health.core.*
+import io.github.kosmologist.health.utils.console
+import io.github.kosmologist.health.utils.isBLESupported
 import kotlinx.android.synthetic.main.activity_main.*
-import java.lang.IllegalStateException
-import java.lang.RuntimeException
-import java.lang.StringBuilder
 import java.security.InvalidKeyException
 import java.security.NoSuchAlgorithmException
 import java.util.*
