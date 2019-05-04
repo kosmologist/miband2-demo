@@ -10,9 +10,9 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import io.github.kosmologist.health.core.*
-import io.github.kosmologist.health.utils.console
-import io.github.kosmologist.health.utils.isBLESupported
+import io.github.kosmologist.healthsdk.core.*
+import io.github.kosmologist.healthsdk.utils.console
+import io.github.kosmologist.healthsdk.utils.isBLESupported
 import kotlinx.android.synthetic.main.activity_main.*
 import java.security.InvalidKeyException
 import java.security.NoSuchAlgorithmException

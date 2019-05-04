@@ -1,4 +1,4 @@
-package io.github.kosmologist.health.utils
+package io.github.kosmologist.healthsdk.utils
 
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter

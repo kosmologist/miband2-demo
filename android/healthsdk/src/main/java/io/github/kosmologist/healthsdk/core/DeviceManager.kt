@@ -1,10 +1,10 @@
-package io.github.kosmologist.health.core
+package io.github.kosmologist.healthsdk.core
 
 import android.bluetooth.BluetoothManager
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.content.Context
-import io.github.kosmologist.health.utils.console
+import io.github.kosmologist.healthsdk.utils.console
 
 class DeviceManager(private val context: Context, val listener: DeviceListener) {
 

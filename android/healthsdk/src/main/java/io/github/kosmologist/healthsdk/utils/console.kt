@@ -1,4 +1,4 @@
-package io.github.kosmologist.health.utils
+package io.github.kosmologist.healthsdk.utils
 
 import android.util.Log
 

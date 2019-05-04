@@ -1,4 +1,4 @@
-package io.github.kosmologist.health.core
+package io.github.kosmologist.healthsdk.core
 
 import android.bluetooth.BluetoothDevice
 
