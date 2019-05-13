@@ -25,3 +25,13 @@ function listenForHeartBeats() {
             store.dispatch(setBeats(beats))
         })
 }
+
+export function deleteLogs() {
+    const collection = getFirestoreRef()
+    collection.get()
+        .then((snapshot)=>{
+            snapshot.docs.forEach(doc=>{
+                doc.ref.delete()
+            })
+        })
+}
