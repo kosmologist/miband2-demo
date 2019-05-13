@@ -1,6 +1,8 @@
 import * as React from "react";
 import {store} from "./store/DataStore";
 import {Line} from "react-chartjs-2";
+import Typography from "@material-ui/core/Typography";
+import {Paper} from "@material-ui/core";
 
 export default class DashboardView extends React.Component {
 
@@ -85,11 +87,18 @@ export default class DashboardView extends React.Component {
 
 
     render() {
-        const beat = this.state.pulses ? this.state.pulses[0] : 0
+        const beat = this.state.pulses ? this.state.pulses[0] : 0;
         return (
-            <div>
-                Heart Rate Monitor: {beat}
-                <Line data={this.getChartData()} height={60}/>
+            <div style={{textAlign:'center', marginTop: 100}}>
+                <Typography variant={"h1"} style={{color:'#797979'}}>{beat}</Typography>
+
+                <Typography variant={"subtitle2"}>Device: Samsung S10+</Typography>
+                <Typography variant={"subtitle2"}>Status: Connected since 2:25 PM</Typography>
+
+
+                <Paper style={{marginTop:20, marginLeft:20, marginRight: 20}}>
+                    <Line data={this.getChartData()} height={60}/>
+                </Paper>
             </div>
         );
     }
