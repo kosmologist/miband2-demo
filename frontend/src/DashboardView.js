@@ -11,8 +11,11 @@ export default class DashboardView extends React.Component {
         }
 
         store.subscribe(() => {
-            console.log('Pulse length: ' + store.getState().beats)
-            this.setState({pulses: store.getState().beats})
+            const pulses =store.getState().beats.map(pulse=>{
+                return pulse.beat
+            })
+            console.log('Pulse length: ' + pulses)
+            this.setState({pulses})
         })
 
 

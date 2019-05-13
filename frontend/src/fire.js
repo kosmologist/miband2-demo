@@ -20,7 +20,7 @@ function listenForHeartBeats() {
         .onSnapshot(documents => {
             const beats = []
             documents.forEach(document => {
-                beats.push(document.data().beat)
+                beats.push(document.data())
             })
             store.dispatch(setBeats(beats))
         })
