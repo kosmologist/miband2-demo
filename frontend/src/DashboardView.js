@@ -56,7 +56,7 @@ export default class DashboardView extends React.Component {
             <div style={{textAlign:'center', marginTop: 100}}>
                 <Typography variant={"h1"} style={{color:'#797979'}}>{beat}</Typography>
 
-                <Typography variant={"subtitle2"}>Device: Samsung S10+</Typography>
+                <Typography variant={"subtitle2"}>Device: Test</Typography>
                 <Typography variant={"subtitle2"}>Status: Connected since 2:25 PM</Typography>
 
 
