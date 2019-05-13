@@ -1,7 +1,7 @@
 import React from "react";
 import {store} from "./store/DataStore";
 import Typography from "@material-ui/core/Typography";
-import {List, ListItem, ListItemText} from "@material-ui/core";
+import {Button, List, ListItem, ListItemText} from "@material-ui/core";
 
 export default class DebugView extends React.Component{
 
@@ -30,8 +30,9 @@ export default class DebugView extends React.Component{
 
     render() {
         return (
-            <div style={{backgroundColor:"#E7E7E7", color:'#424242', height: 700, overflow:"auto"}}>
-                <Typography>Debug View</Typography>
+            <div style={{ color:'#424242', height: 700, overflow:"auto"}}>
+                <Typography variant={"h6"}>Debug View</Typography>
+                <Button>Delete Logs</Button>
                 <List dense>
                     {this.getBeats()}
                 </List>
