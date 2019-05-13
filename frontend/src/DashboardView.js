@@ -7,11 +7,8 @@ import {Paper} from "@material-ui/core";
 export default class DashboardView extends React.Component {
 
     constructor(props) {
-        super(props)
-        this.state = {
-            pulses: []
-        }
-
+        super(props);
+        this.state = { pulses: [] };
         store.subscribe(() => {
             const pulses =store.getState().beats.map(pulse=>{
                 return pulse.beat
@@ -19,8 +16,6 @@ export default class DashboardView extends React.Component {
             console.log('Pulse length: ' + pulses)
             this.setState({pulses})
         })
-
-
         /*        setInterval(() => {
                     let {pulses} = this.state;
                     if (pulses.length > 50) {
@@ -45,46 +40,15 @@ export default class DashboardView extends React.Component {
                 {
                     label: 'BPM',
                     data: this.state.pulses,
-                    backgroundColor: ['rgba(255, 55, 67, 0.72)'],
-                    borderColor: ['rgba(255, 55, 67, 1)'],
+                    backgroundColor: ['#E7E7E7'],
+                    borderColor: ['#797979'],
                     borderWidth: 2,
                     fill: true,
                     lineTension: 0.1
                 }
             ],
-            options: {
-                animation: {
-                    duration: 0, // general animation time
-                },
-                hover: {
-                    animationDuration: 0, // duration of animations when hovering an item
-                },
-                responsiveAnimationDuration: 0,
-                scales: {
-                    xAxes: [{
-                        display: false,
-                        barPercentage: 1.3,
-                        ticks: {
-                            max: 3,
-                        }
-                    }, {
-                        display: true,
-                        ticks: {
-                            autoSkip: false,
-                            max: 4,
-                        }
-                    }],
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true
-                        }
-                    }]
-                }
-            },
-
         }
-    }
-
+    };
 
     render() {
         const beat = this.state.pulses ? this.state.pulses[0] : 0;
