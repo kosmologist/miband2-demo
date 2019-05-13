@@ -51,7 +51,7 @@ export default class DashboardView extends React.Component {
     };
 
     render() {
-        const beat = this.state.pulses ? this.state.pulses[0] : 0;
+        const beat = this.state.pulses && this.state.pulses.length > 0 ? this.state.pulses[0] : 0;
         return (
             <div style={{textAlign:'center', marginTop: 100}}>
                 <Typography variant={"h1"} style={{color:'#797979'}}>{beat}</Typography>
