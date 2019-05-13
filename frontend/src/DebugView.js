@@ -18,10 +18,13 @@ export default class DebugView extends React.Component{
     getBeats = ()=>{
         return this.state.beats.map(beat=>{
             return (
-                <ListItem>
+                <ListItem style={{padding:0}}>
                     <ListItemText
-                        primary={beat.beat}
-                        secondary={Date(beat.timestamp).toString()}
+                        primary={
+                            <Typography style={{color:'#797979'}}>
+                                {beat.beat + ' (' + new Date(beat.timestamp).toLocaleString() + ')'}
+                            </Typography>
+                        }
                     />
                 </ListItem>
             )
