@@ -1,14 +1,25 @@
 import React from 'react';
 import {Line} from 'react-chartjs-2'
+import {initFirebase} from "./fire";
+import {store} from './store/DataStore';
 
 class App extends React.Component {
 
     constructor(props) {
-        super(props)
+        super(props);
+        initFirebase();
+
         this.state = {
             pulses: []
         }
-        setInterval(() => {
+
+        store.subscribe(() => {
+            console.log('Pulse length: ' + store.getState().beats)
+            this.setState({pulses: store.getState().beats})
+        })
+
+
+/*        setInterval(() => {
             let {pulses} = this.state;
             if (pulses.length > 50) {
                 pulses.shift();
@@ -20,7 +31,7 @@ class App extends React.Component {
                     pulses: [...this.state.pulses, this.random(105, 40)]
                 })
             }
-        }, 1000)
+        }, 1000)*/
     }
 
     random = (max, min) => Math.random() * (max - min) + min
@@ -39,7 +50,7 @@ class App extends React.Component {
                     lineTension: 0.1
                 }
             ],
-            options:{
+            options: {
                 animation: {
                     duration: 0, // general animation time
                 },
@@ -63,7 +74,7 @@ class App extends React.Component {
                     }],
                     yAxes: [{
                         ticks: {
-                            beginAtZero:true
+                            beginAtZero: true
                         }
                     }]
                 }
@@ -73,10 +84,11 @@ class App extends React.Component {
     }
 
     render() {
+        const beat = this.state.pulses ? this.state.pulses[0] : 0
         return (
             <div>
-                Heart Rate Monitor
-                <Line data={this.getChartData()} height={60} />
+                Heart Rate Monitor: {beat}
+                <Line data={this.getChartData()} height={60}/>
             </div>
         );
     }
