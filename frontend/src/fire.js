@@ -1,22 +1,26 @@
 import {firebaseConfig} from "./firebase.config";
 import firebase from "firebase";
-import {setBeats, setPresence} from "./store/Actions";
+import {setAttendance, setBeats, setPresence} from "./store/Actions";
 import {store} from './store/DataStore'
+
+const heartbeats = 'heartbeats'
+const presence = 'presence'
+
 export function initFirebase() {
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig)
     listenForHeartBeats()
     listenForPresence()
 }
 
-function getFirestoreRef() {
+function getFirestoreRef(node) {
     const db = firebase.firestore();
     return db.collection('users')
         .doc('test')    // this should be unique device Id
-        .collection('heartbeats')
+        .collection(node)
 }
 
 function listenForHeartBeats() {
-    const collection = getFirestoreRef()
+    const collection = getFirestoreRef(heartbeats)
     collection.orderBy('timestamp', 'desc')
         .onSnapshot(documents => {
             const beats = []
@@ -27,8 +31,18 @@ function listenForHeartBeats() {
         })
 }
 
-export function deleteLogs() {
-    const collection = getFirestoreRef()
+export function deleteHeartBeatLogs() {
+    const collection = getFirestoreRef(heartbeats)
+    collection.get()
+        .then((snapshot)=>{
+            snapshot.docs.forEach(doc=>{
+                doc.ref.delete()
+            })
+        })
+}
+
+export function deleteAttendanceLogs() {
+    const collection = getFirestoreRef(presence)
     collection.get()
         .then((snapshot)=>{
             snapshot.docs.forEach(doc=>{
@@ -38,6 +52,16 @@ export function deleteLogs() {
 }
 
 function listenForPresence() {
+    const collection = getFirestoreRef(presence)
+    collection.orderBy('timestamp', 'desc')
+        .onSnapshot(documents => {
+            const attendance = []
+            documents.forEach(document=>{
+                attendance.push(document.data())
+            })
+            console.log(attendance)
+            store.dispatch(setAttendance(attendance))
+        })
     firebase.database().ref('test').on('value', snapshot=>{
         console.log('Presence', snapshot.val())
         store.dispatch(setPresence(snapshot.val()))

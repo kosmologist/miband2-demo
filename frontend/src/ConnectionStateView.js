@@ -1,6 +1,6 @@
 import React from "react";
 import Typography from "@material-ui/core/Typography";
-import {Cancel, CheckCircle} from "@material-ui/icons";
+import {CancelOutlined, CheckCircleOutline} from "@material-ui/icons";
 import {store} from './store/DataStore'
 
 export default class ConnectionStateView extends React.Component {
@@ -27,7 +27,7 @@ export default class ConnectionStateView extends React.Component {
         const since = this.state.since
         return (
             <div style={{display: 'inline-flex', alignItems: 'center'}}>
-                {isOnline ? <CheckCircle style={{color: '#00e676'}}/> : <Cancel style={{color: '#ff5252'}}/>}
+                {isOnline ? <CheckCircleOutline style={{color: '#00e676'}}/> : <CancelOutlined style={{color: '#ff5252'}}/>}
                 <Typography variant={"subtitle2"} style={{marginLeft: 10}}>{isOnline ? 'Online' : 'Offline'} since {new Date(since).toLocaleString()}</Typography>
             </div>
         );

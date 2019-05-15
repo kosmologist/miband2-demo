@@ -1,5 +1,6 @@
 export const SET_BEATS = 'SET_BEATS'
 export const SET_PRESENCE = 'SET_PRESENCE'
+export const SET_ATTENDANCE = 'SET_ATTENDANCE'
 
 export function setBeats(beats) {
     return {
@@ -12,5 +13,12 @@ export function setPresence(status) {
     return {
         type: SET_PRESENCE,
         payload: status
+    }
+}
+
+export function setAttendance(attendance) {
+    return {
+        type:SET_ATTENDANCE,
+        payload:attendance
     }
 }
