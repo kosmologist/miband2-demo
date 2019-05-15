@@ -3,6 +3,7 @@ import {store} from "./store/DataStore";
 import {Line} from "react-chartjs-2";
 import Typography from "@material-ui/core/Typography";
 import {Paper} from "@material-ui/core";
+import ConnectionStateView from "./ConnectionStateView";
 
 export default class DashboardView extends React.Component {
 
@@ -57,8 +58,7 @@ export default class DashboardView extends React.Component {
                 <Typography variant={"h1"} style={{color:'#797979'}}>{beat}</Typography>
 
                 <Typography variant={"subtitle2"}>Device: Test</Typography>
-                <Typography variant={"subtitle2"}>Status: Connected since 2:25 PM</Typography>
-
+                <ConnectionStateView />
 
                 <Paper style={{marginTop:20, marginLeft:20, marginRight: 20}}>
                     <Line data={this.getChartData()} height={60}/>

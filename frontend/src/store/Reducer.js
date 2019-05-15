@@ -1,4 +1,4 @@
-import {SET_BEATS} from "./Actions";
+import {SET_BEATS, SET_PRESENCE} from "./Actions";
 
 export default (state, action) => {
     switch (action.type) {
@@ -7,6 +7,11 @@ export default (state, action) => {
             return {
                 ...state,
                 beats: action.payload
+            };
+        case SET_PRESENCE:
+            return {
+                ...state,
+                status: action.payload
             }
         default:
             return state;

@@ -1,10 +1,11 @@
 import {firebaseConfig} from "./firebase.config";
 import firebase from "firebase";
-import {setBeats} from "./store/Actions";
+import {setBeats, setPresence} from "./store/Actions";
 import {store} from './store/DataStore'
 export function initFirebase() {
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig)
     listenForHeartBeats()
+    listenForPresence()
 }
 
 function getFirestoreRef() {
@@ -34,4 +35,11 @@ export function deleteLogs() {
                 doc.ref.delete()
             })
         })
+}
+
+function listenForPresence() {
+    firebase.database().ref('test').on('value', snapshot=>{
+        console.log('Presence', snapshot.val())
+        store.dispatch(setPresence(snapshot.val()))
+    })
 }
