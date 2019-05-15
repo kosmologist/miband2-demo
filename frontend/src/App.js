@@ -2,7 +2,7 @@ import React from 'react';
 import {initFirebase} from "./fire";
 import DashboardView from "./DashboardView";
 import {Grid} from "@material-ui/core";
-import DebugView from "./DebugView";
+import PulseMonitor from "./PulseMonitor";
 import AttendanceView from "./AttendanceView";
 
 class App extends React.Component {
@@ -22,7 +22,7 @@ class App extends React.Component {
                     <DashboardView/>
                 </Grid>
                 <Grid item xs={2}>
-                    <DebugView/>
+                    <PulseMonitor/>
                 </Grid>
             </Grid>
         )

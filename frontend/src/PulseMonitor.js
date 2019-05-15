@@ -4,7 +4,7 @@ import Typography from "@material-ui/core/Typography";
 import {Button, List, ListItem, ListItemText} from "@material-ui/core";
 import {deleteHeartBeatLogs} from "./fire";
 
-export default class DebugView extends React.Component{
+export default class PulseMonitor extends React.Component{
 
     constructor(props){
         super(props)
