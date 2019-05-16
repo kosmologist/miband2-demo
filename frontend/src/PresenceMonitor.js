@@ -4,7 +4,7 @@ import Typography from "@material-ui/core/Typography";
 import {Button, List, ListItem, ListItemText} from "@material-ui/core";
 import {deleteAttendanceLogs} from "./fire";
 
-export default class AttendanceView extends React.Component {
+export default class PresenceMonitor extends React.Component {
 
     constructor(props) {
         super(props)
@@ -42,7 +42,7 @@ export default class AttendanceView extends React.Component {
     render() {
         return (
             <div style={{ color:'#424242', height: 700, overflow:"auto", marginTop:20, marginLeft:20, textAlign:'center'}}>
-                <Typography variant={"h6"} style={{color:'#676767'}}>Presence Monitor</Typography>
+                <Typography variant={"h6"} style={{color:'#676767'}}>Presence</Typography>
                 <Button variant={"outlined"} style={{marginTop:10, marginBottom:10}} onClick={()=>this.onLogsDelete()}>Delete Logs</Button>
                 <List dense>
                     {this.getAttendance()}

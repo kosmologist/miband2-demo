@@ -3,7 +3,7 @@ import {initFirebase} from "./fire";
 import DashboardView from "./DashboardView";
 import {Grid} from "@material-ui/core";
 import PulseMonitor from "./PulseMonitor";
-import AttendanceView from "./AttendanceView";
+import PresenceMonitor from "./PresenceMonitor";
 
 class App extends React.Component {
 
@@ -16,7 +16,7 @@ class App extends React.Component {
         return (
             <Grid container>
                 <Grid item xs={2}>
-                    <AttendanceView/>
+                    <PresenceMonitor/>
                 </Grid>
                 <Grid item xs={8}>
                     <DashboardView/>
