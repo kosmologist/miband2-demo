@@ -1,4 +1,4 @@
-import {SET_ATTENDANCE, SET_BEATS, SET_PRESENCE} from "./Actions";
+import {SET_ATTENDANCE, SET_BEATS, SET_DEVICE_ID, SET_PRESENCE} from "./Actions";
 
 export default (state, action) => {
     switch (action.type) {
@@ -18,6 +18,11 @@ export default (state, action) => {
                 ...state,
                 attendance: action.payload
             };
+        case SET_DEVICE_ID:
+            return {
+                ...state,
+                deviceId: action.payload
+            }
         default:
             return state;
     }

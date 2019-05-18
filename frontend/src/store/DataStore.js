@@ -3,7 +3,8 @@ import reducers from './Reducer'
 
 
 const initialState = {
-    beats : []
+    beats : [],
+    deviceId:'test'
 }
 
 export const store = createStore(reducers,initialState)

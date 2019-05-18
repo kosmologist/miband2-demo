@@ -30,7 +30,7 @@ class DashboardView extends React.Component {
             <div style={{textAlign: 'center', marginTop: 100}}>
                 <Typography variant={"h1"} style={{color: '#797979'}}>{beat}</Typography>
 
-                <Typography variant={"subtitle2"}>Device: Test</Typography>
+                <Typography variant={"subtitle2"}>Device: {this.props.deviceId}</Typography>
                 <ConnectionStateView/>
 
                 <Paper style={{marginTop: 20, marginLeft: 20, marginRight: 20}}>
@@ -44,10 +44,11 @@ class DashboardView extends React.Component {
 
 const mapStateToProps = state => {
     const beats = state.beats ? state.beats : []
+    const deviceId = state.deviceId
     const pulses = beats.map(pulse => {
         return pulse.beat
     })
-    return {pulses}
+    return {pulses, deviceId}
 }
 
 const Dashboard = connect(mapStateToProps)(DashboardView)

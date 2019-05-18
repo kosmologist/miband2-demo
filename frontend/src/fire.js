@@ -15,7 +15,7 @@ export function initFirebase() {
 function getFirestoreRef(node) {
     const db = firebase.firestore();
     return db.collection('users')
-        .doc('test')    // this should be unique device Id
+        .doc(store.getState().deviceId)    // this should be unique device Id
         .collection(node)
 }
 

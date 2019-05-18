@@ -4,28 +4,31 @@ import Dashboard from "./DashboardView";
 import {AppBar, Grid, IconButton, Toolbar, Typography} from "@material-ui/core";
 import Pulse from "./PulseMonitor";
 import Presence from "./PresenceMonitor";
-import {AndroidOutlined, FitnessCenterOutlined} from "@material-ui/icons";
-import {createMuiTheme, MuiThemeProvider} from "@material-ui/core/styles/";
+import {SettingsOutlined, FitnessCenterOutlined} from "@material-ui/icons";
+import Setting from "./SettingsDialog";
 
 export default class App extends React.Component {
 
     constructor(props) {
         super(props);
         initFirebase();
+        this.settings = React.createRef()
     }
 
     showSettingsModal = () => {
         console.log('Showing settings modal')
+        this.settings.current.handleOpen();
     }
 
     render() {
         return (
             <Fragment>
+                <Setting ref={this.settings}/>
                 <AppBar style={{backgroundColor: '#ffffff'}} position={"static"}>
                     <Toolbar>
                         <IconButton><FitnessCenterOutlined/></IconButton>
                         <Typography variant={"h6"} style={{flexGrow: 1}}>Demo</Typography>
-                        <IconButton onClick={this.showSettingsModal}><AndroidOutlined/></IconButton>
+                        <IconButton onClick={this.showSettingsModal}><SettingsOutlined/></IconButton>
                     </Toolbar>
                 </AppBar>
                 <Grid container>
