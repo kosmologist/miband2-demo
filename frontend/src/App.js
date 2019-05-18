@@ -1,11 +1,11 @@
 import React from 'react';
 import {initFirebase} from "./fire";
-import DashboardView from "./DashboardView";
+import Dashboard from "./DashboardView";
 import {Grid} from "@material-ui/core";
-import PulseMonitor from "./PulseMonitor";
-import PresenceMonitor from "./PresenceMonitor";
+import Pulse from "./PulseMonitor";
+import Presence from "./PresenceMonitor";
 
-class App extends React.Component {
+export default class App extends React.Component {
 
     constructor(props) {
         super(props);
@@ -16,17 +16,16 @@ class App extends React.Component {
         return (
             <Grid container>
                 <Grid item xs={2}>
-                    <PresenceMonitor/>
+                    <Presence/>
                 </Grid>
                 <Grid item xs={8}>
-                    <DashboardView/>
+                    <Dashboard/>
                 </Grid>
                 <Grid item xs={2}>
-                    <PulseMonitor/>
+                    <Pulse/>
                 </Grid>
             </Grid>
         )
     }
 }
 
-export default App;
