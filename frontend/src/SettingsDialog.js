@@ -47,7 +47,7 @@ class SettingsDialog extends React.Component {
                 <DialogTitle>Settings</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        Set Streaming ID to view logs device specific logs
+                        Set Streaming ID to view device specific logs
                         <TextField
                             variant={"outlined"}
                             label={"Device ID"}
