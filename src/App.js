@@ -27,7 +27,8 @@ export default class App extends React.Component {
                 <AppBar style={{backgroundColor: '#ffffff'}} position={"static"}>
                     <Toolbar>
                         <IconButton><FitnessCenterOutlined/></IconButton>
-                        <Typography variant={"h6"} style={{flexGrow: 1}}>Demo</Typography>
+                        <Typography variant={"h6"} >Demo</Typography>
+                        <Typography variant={"body2"} style={{marginLeft:10, flexGrow: 1}}>0.3.0</Typography>
                         <IconButton onClick={this.showSettingsModal}><SettingsOutlined/></IconButton>
                     </Toolbar>
                 </AppBar>
