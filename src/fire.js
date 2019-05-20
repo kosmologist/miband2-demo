@@ -19,9 +19,11 @@ function getFirestoreRef(node) {
         .collection(node)
 }
 
+let pulseListener
 function listenForHeartBeats() {
     const collection = getFirestoreRef(heartbeats)
-    collection.orderBy('timestamp', 'desc')
+    if (pulseListener) pulseListener()
+    pulseListener = collection.orderBy('timestamp', 'desc')
         .onSnapshot(documents => {
             const beats = []
             documents.forEach(document => {
@@ -51,9 +53,12 @@ export function deleteAttendanceLogs() {
         })
 }
 
+
+let presenceListener;
 function listenForPresence() {
     const collection = getFirestoreRef(presence)
-    collection.orderBy('timestamp', 'desc')
+    if (presenceListener) presenceListener()
+    presenceListener = collection.orderBy('timestamp', 'desc')
         .onSnapshot(documents => {
             const attendance = []
             documents.forEach(document=>{
@@ -62,7 +67,9 @@ function listenForPresence() {
             console.log(attendance)
             store.dispatch(setAttendance(attendance))
         })
-    firebase.database().ref('test').on('value', snapshot=>{
+
+    firebase.database().ref(store.getState().deviceId).off()
+    firebase.database().ref(store.getState().deviceId).on('value', snapshot=>{
         console.log('Presence', snapshot.val())
         store.dispatch(setPresence(snapshot.val()))
     })
