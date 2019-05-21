@@ -28,13 +28,13 @@ export default class App extends React.Component {
                     <Toolbar>
                         <IconButton><FitnessCenterOutlined/></IconButton>
                         <Typography variant={"h6"} >Demo</Typography>
-                        <Typography variant={"body2"} style={{marginLeft:10, flexGrow: 1}}>0.3.0</Typography>
+                        <Typography variant={"body2"} style={{marginLeft:10, flexGrow: 1}}>0.4.0</Typography>
                         <IconButton onClick={this.showSettingsModal}><SettingsOutlined/></IconButton>
                     </Toolbar>
                 </AppBar>
                 <Grid container>
                     <Grid item xs={2}>
-                        <Presence/>
+                        {/*<Presence/>*/}
                     </Grid>
                     <Grid item xs={8}>
                         <Dashboard/>

@@ -31,7 +31,7 @@ class DashboardView extends React.Component {
                 <Typography variant={"h1"} style={{color: '#797979'}}>{beat}</Typography>
 
                 <Typography variant={"subtitle2"}>Device: {this.props.deviceId}</Typography>
-                <ConnectionStateView/>
+                {/*<ConnectionStateView/>*/}
 
                 <Paper style={{marginTop: 20, marginLeft: 20, marginRight: 20}}>
                     <Line data={this.getChartData()} height={60}/>

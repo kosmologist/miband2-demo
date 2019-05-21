@@ -31,7 +31,7 @@ class PulseMonitor extends React.Component {
         return (
             <div style={{color: '#424242', height: 700, overflow: "auto", marginTop: 20, textAlign: 'center'}}>
                 <Typography variant={"h6"} style={{color: '#676767'}}>Pulse</Typography>
-                <Typography variant={"body1"}>WARN: Stop streaming data before deleting logs to avoid unexpected
+                <Typography variant={"body1"}>Note: Stop streaming data before deleting logs to avoid unexpected
                     results</Typography>
                 <Button variant={"outlined"} style={{marginTop: 10, marginBottom: 10}}
                         onClick={() => this.onLogsDelete()}>Delete Logs</Button>
