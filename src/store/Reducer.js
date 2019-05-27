@@ -1,4 +1,4 @@
-import {SET_ATTENDANCE, SET_BEATS, SET_DEVICE_ID, SET_PRESENCE} from "./Actions";
+import {SET_ATTENDANCE, SET_BEATS, SET_DEVICE_ID, SET_DEVICES, SET_PRESENCE, SET_QUOTA_EXCEEDED} from "./Actions";
 
 export default (state, action) => {
     switch (action.type) {
@@ -22,6 +22,16 @@ export default (state, action) => {
             return {
                 ...state,
                 deviceId: action.payload
+            }
+        case SET_DEVICES:
+            return {
+                ...state,
+                devices: action.payload
+            }
+        case SET_QUOTA_EXCEEDED:
+            return {
+                ...state,
+                quotaExceeded: action.payload
             }
         default:
             return state;

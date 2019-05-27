@@ -4,7 +4,9 @@ import reducers from './Reducer'
 
 const initialState = {
     beats : [],
-    deviceId:'test'
+    deviceId:'',
+    devices:[],
+    quotaExceeded:false
 }
 
 export const store = createStore(reducers,initialState)
