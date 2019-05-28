@@ -10,7 +10,7 @@ import {
 } from "@material-ui/core";
 import {connect} from "react-redux";
 import {setDeviceId} from "./store/Actions";
-import {initFirebase, listenForHeartBeats} from "./fire";
+import {initFirebase} from "./fire";
 
 
 class SettingsDialog extends React.Component {
@@ -34,8 +34,7 @@ class SettingsDialog extends React.Component {
     handleSubmit = ()=>{
         console.log('Device Id: ' + this.state.deviceId)
         this.props.setDeviceId(this.state.deviceId)
-        //initFirebase()
-        listenForHeartBeats()
+        initFirebase()
         this.handleClose()
     }
 

@@ -1,6 +1,6 @@
 import {firebaseConfig} from "./firebase.config";
 import firebase from "firebase";
-import {setAttendance, setBeats, setDevices, setPresence, setQuotaExceeded} from "./store/Actions";
+import {setAttendance, setBeats, setPresence} from "./store/Actions";
 import {store} from './store/DataStore'
 
 const heartbeats = 'heartbeats'
@@ -8,9 +8,8 @@ const presence = 'presence'
 
 export function initFirebase() {
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig)
-    //listenForHeartBeats()
-    //listenForPresence()
-    getDevices()
+    listenForHeartBeats()
+    listenForPresence()
 }
 
 function getFirestoreRef(node) {
@@ -20,28 +19,8 @@ function getFirestoreRef(node) {
         .collection(node)
 }
 
-function getDevices(){
-    const db = firebase.firestore();
-    db.collection('users')
-        .get()
-        .then(snapshot=>{
-            console.log('Total Devices: ' + snapshot.size)
-            const devices = []
-            snapshot.forEach(doc=>{
-                devices.push(doc.id)
-            })
-            store.dispatch(setDevices(devices))
-        })
-        .catch(err=>{
-            if (err.toString().indexOf("Quota exceeded")!==-1){
-                console.error("Quota Exceeded")
-                store.dispatch(setQuotaExceeded(true))
-            }
-        })
-}
-
 let pulseListener
-export function listenForHeartBeats() {
+function listenForHeartBeats() {
     const collection = getFirestoreRef(heartbeats)
     if (pulseListener) pulseListener()
     pulseListener = collection.orderBy('timestamp', 'desc')
