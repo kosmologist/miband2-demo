@@ -1,5 +1,14 @@
 {
   "projects": {
     "default": "health-66ad1"
+  },
+  "targets": {
+    "wavytsoftfirebase77731": {
+      "hosting": {
+        "demo": [
+          "wavy-demo"
+        ]
+      }
+    }
   }
 }

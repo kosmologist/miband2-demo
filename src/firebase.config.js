@@ -1,9 +1,9 @@
 export const firebaseConfig = {
-    apiKey: "AIzaSyDusfRgG_9TGvrqwGEy6puz-v_fTOUpr58",
-    authDomain: "health-66ad1.firebaseapp.com",
-    databaseURL: "https://health-66ad1.firebaseio.com",
-    projectId: "health-66ad1",
-    storageBucket: "health-66ad1.appspot.com",
-    messagingSenderId: "541358192380",
-    appId: "1:541358192380:web:d202f240b77ae505"
+    apiKey: "AIzaSyAjG1eWYawaRxsYxX795hIcC56zky6Nlr8",
+    authDomain: "wavytsoftfirebase77731.firebaseapp.com",
+    databaseURL: "https://wavytsoftfirebase77731.firebaseio.com",
+    projectId: "wavytsoftfirebase77731",
+    storageBucket: "wavytsoftfirebase77731.appspot.com",
+    messagingSenderId: "23126046206",
+    appId: "1:23126046206:web:0881f51029da35eb"
 };
